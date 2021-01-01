@@ -1,0 +1,16 @@
+{
+  "name": "snowy-discord-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mroutput/jscalc": "^1.0.5",
+    "discord.js": "^12.5.1"
+  }
+}
