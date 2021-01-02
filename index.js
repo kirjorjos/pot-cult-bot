@@ -48,6 +48,7 @@ try {
 	message.reply('Invalid command.');
   }
 }
+});
 
 
-client.login(token);
+client.login(token)
