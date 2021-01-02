@@ -27,7 +27,9 @@ client.on('message', message => {
   messagesSent = messagesSent + 1;
   if (!message.content.startsWith(prefix) || message.author.bot)  return;
 
-  
+  if (message.channel.id == '794994427109310465') {
+
+  }
 
 
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
