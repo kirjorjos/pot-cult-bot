@@ -1,10 +1,17 @@
-
+const Calculator = require("@mroutput/jscalc");
+var c = new Calculator();
 
 module.exports = {
-	name: 'ping',
+	name: 'calc',
 	description: 'Ping!',
 	execute(message, args, authorID, owner) {
-		code = args.join(' ');
-    message.channel.send(c);
+    var result;
+    console.log(args.join())
+    try {
+      result = c.exec(args.join(""));
+    } catch(e) {
+      result = "Faulty expression."
+    }
+    message.channel.send(result);
 	},
 };
