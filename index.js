@@ -1,56 +1,48 @@
-const keep_alive = require('./keep_alive.js')
-const fs = require('fs');
+const keep_alive = require('./keep_alive.js')   //run bot a a webserver so repl keeps it alive
 const Discord = require('discord.js');
-const client = new Discord.Client();
+const bot = new Discord.Client();
 const token = process.env.TOKEN;
 const prefix = process.env.PREFIX;
 const owner = process.env.OWNER
-client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const { exec } = require("child_process");
-const allCommands = fs.readdirSync('./commands');
-var messagesSent = 0;
+const fs = require('fs');   //file manager access
+bot.commands = new Discord.Collection();
 
-
-
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
-}
-
-client.on('ready', () => {
-  console.log("I'm in");
-  console.log(client.user.username);
-});
-
-client.on('message', message => {
-  messagesSent = messagesSent + 1;
-  if (!message.content.startsWith(prefix) || message.author.bot)  return;
-
-  if (message.channel.id == '794994427109310465') {
-
+fs.readdir('./commands/', (err, files) => {
+  if(err) console.error(err);
+  let jsfiles = files.filter(f => f.split('.').pop() === 'js');
+  if(jsfiles.length <= 0) {
+    console.log('No commands');
+    return;
   }
 
+  console.log(`Loading ${jsfiles.length} commands.`);
 
-	const args = message.content.slice(prefix.length).trim().split(/ +/);
-	const command = args.shift().toLowerCase();
-  const authorID = message.author.id
-
-  if (Math.round(messagesSent/100 == messagesSent/100)) {
-      //pokespawn here
-  };
-
-try {
-	client.commands.get(command).execute(message, args, authorID, owner);
-} catch (error) {
-	console.error(error);
-  if (allCommands.includes(command + '.js')) {
-    message.reply('There was an error with that command, please make sure all the arguments are correct.');
-  } else {
-	message.reply('Invalid command.');
-  }
-}
+  jsfiles.forEach((f, i) => {
+    let props = require(`./commands/${f}`);
+    bot.commands.set(props.help.name, props);
+  });
 });
 
+bot.on("ready", async () => {
+  console.log(`Logged in as ${bot.user.username}`);
+});
 
-client.login(token)
+bot.on("message", async message => {
+  if(message.author.bot) return;
+  if(message.channel.type === "dm") return;
+
+  let messageArray = message.content.split(' ');
+  let command = messageArray[0];
+  let args = messageArray.slice(1);
+
+  if(!command.startsWith(prefix)) return;
+  
+  let cmd = bot.commands.get(command.slice(prefix.length));
+  try {
+      if(cmd) cmd.run(bot, message, args, owner, prefix);
+  } catch(e) {
+    console.log(e.stack);
+  }
+});
+
+bot.login(token);
