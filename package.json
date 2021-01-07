@@ -13,6 +13,7 @@
     "@mroutput/jscalc": "^1.0.5",
     "ascii-table": "0.0.9",
     "discord.js": "^12.5.1",
-    "snekfetch": "^3.2.9"
+    "snekfetch": "^3.2.9",
+    "ytdl-core": "^4.4.0"
   }
 }
