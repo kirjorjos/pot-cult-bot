@@ -3,7 +3,7 @@ const Discord = require('discord.js');
 module.exports = {
     name: "poll",
     category: "useful",
-    usgae: "poll <poll>",
+    usage: "poll <poll>",
     description: "basic poll",
     run: async (bot, message, args) => {
         let pollDescription = args.slice(0).join(' ');
