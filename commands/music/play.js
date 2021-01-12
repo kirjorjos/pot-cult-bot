@@ -2,26 +2,28 @@ const commando = require('discord.js-commando');
 const {Util, MessageEmbed} = require('discord.js')
 const ytdl = require("ytdl-core");
 const yts = require("yt-search");
-var ffmpeg = require('ffmpeg');
+const sendError = require('../../Util/error')
 
 module.exports = {
     name: "play",
     category: "music",
-    usage: "play <url/search query>",
-    description: "Plays a youtube video or adds it to the queue",
-    run: async (bot, message, args, prefix, owner) => {
-        const channel = message.member.voice.channel;
-        if (!channel)return message.channel.send("I'm sorry but you need to be in a voice channel to play music!");
+    usage: "play <URL/Search>",
+    description: "Plays a youtube song",
+    run: async (bot, message, args) => {
+       const channel = message.member.voice.channel;
+        if (!channel)return sendError("I'm sorry but you need to be in a voice channel to play music!", message.channel);
     
-        
+        const permissions = channel.permissionsFor(message.client.user);
+        if (!permissions.has("CONNECT"))return sendError("I cannot connect to your voice channel, make sure I have the proper permissions!", message.channel);
+        if (!permissions.has("SPEAK"))return sendError("I cannot speak in this voice channel, make sure I have the proper permissions!", message.channel);
     
         var searchString = args.join(" ");
-        
+        if (!searchString)return sendError("You didn't provide a song for me to play.", message.channel);
     
-        var serverQueue = bot.queue.get(786719754140123138);
+        var serverQueue = message.client.queue.get(message.guild.id);
     
-        try {var searched = await yts.search(searchString)} catch {message.channel.send("You didn't provide a song for me to play.")}
-        if(searched.videos.length === 0)return message.channel.send("Looks like i was unable to find the song on YouTube")
+        var searched = await yts.search(searchString)
+        if(searched.videos.length === 0)return sendError("Looks like i was unable to find the song on YouTube", message.channel)
         var songInfo = searched.videos[0]
     
         const song = {
@@ -34,6 +36,7 @@ module.exports = {
           img: songInfo.image,
           req: message.author
         };
+
     
         if (serverQueue) {
           serverQueue.songs.push(song);
@@ -57,22 +60,18 @@ module.exports = {
           volume:3,    
           playing: true, //! If you want the bot to stay in a vc and not remove this line.
         };
-        bot.queue.set(786719754140123138, queueConstruct);
+        message.client.queue.set(message.guild.id, queueConstruct);
         queueConstruct.songs.push(song);
     
         const play = async (song) => {
-          const queue = bot.queue.get(786719754140123138);
-          if (!song) {
-            setTimeout(function () {
-              if (queue.connection.dispatcher && message.guild.me.voice.channel) return;
-              queue.voiceChannel.leave();//If you want your bot stay in vc 24/7 remove this line :D
-              message.channel.send("Leaving the voice channel because I think there are no songs in the queue. [GitHub](https://github.com/ThatGuyJamal/DeepWebAPI-Git-host)")
-            }, 60000);
+          const queue = bot.queue.get(message.guild.id);
+          if (typeof(song) == 'undefined') {
+            console.log(song)
             queue.textChannel.send(`🎶 Music queue ended by ${message.author.tag} / ID:(${message.author.id})`).catch(console.error);
-            return bot.queue.delete(786719754140123138);
+            return message.client.queue.delete(message.guild.id);
           }
          
-    
+          console.log(ytdl(song.url))
           const dispatcher = queue.connection
             .play(ytdl(song.url))
             .on("finish", () => {
@@ -98,12 +97,12 @@ module.exports = {
           queueConstruct.connection = connection;
           channel.guild.voice.setSelfDeaf(true)
           play(queueConstruct.songs[0]);
+          
         } catch (error) {
           console.error(`I could not join the voice channel: ${error}`);
-          bot.queue.delete(786719754140123138);
+          message.client.queue.delete(message.guild.id);
           await channel.leave();
-          return message.channel.send(`I could not join the voice channel: ${error}`);
+          return sendError(`I could not join the voice channel: ${error}`, message.channel);
         }
-    
     }
 }

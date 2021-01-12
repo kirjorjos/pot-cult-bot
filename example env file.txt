@@ -1,4 +1,4 @@
 TOKEN:TOKEN.HERE.ONE.WORD.NO.SPACE.NO.QUOTES
 OWNER:[list, of, owner, IDs, that, only, bot, not, server, owner, can, run]
 PREFIX:(1 charcter here, no ( or ), no space)
-WIPCOMMANDS:[list, of, command]
+WIPCOMMANDS:[list, of, commands]

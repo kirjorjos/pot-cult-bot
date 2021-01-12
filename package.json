@@ -27,6 +27,6 @@
     "soundcloud-downloader": "^0.2.3",
     "yt-search": "^2.5.1",
     "ytdl": "^1.4.1",
-    "ytdl-core": "^4.4.1"
+    "ytdl-core": "^4.4.2"
   }
 }

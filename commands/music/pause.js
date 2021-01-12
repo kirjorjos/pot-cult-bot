@@ -2,19 +2,21 @@ module.exports = {
     name: "pause",
     category: "music",
     usage: "pause",
-    description: "Pauses the song, use play to resume",
+    description: "Pauses the current song",
     run: async (bot, message, args) => {
        const { MessageEmbed } = require('discord.js')
-        const serverQueue = bot.queue.get(786719754140123138);
+        const sendError = require('../../Util/error')
+        const serverQueue = bot.queue.get(message.guild.id);
 
-        const channel = message.member.voice.channel
+        const channel = message.author.voice.channel
         if (!channel) {
-            return message.channel.send("You are not in the corrent voice channel.")
-        } else if (serverQueue && serverQueue.playing) {
+            return sendError("You are not in the corrent voice channel.", message.channel)
+        }
+         else if (serverQueue && serverQueue.playing) {
             serverQueue.playing = false;
             serverQueue.connection.dispatcher.pause();
-            message.channel.send('i have paused the music.')
+            message.channel.send('I have paused the music.',)
         }
-        return message.channel.send("There is nothing playing in your server.")
+        return sendError("There is nothing playing in your server.", message.channel)
     }
 }

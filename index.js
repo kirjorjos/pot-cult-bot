@@ -9,10 +9,18 @@ const fs = require('fs');   //file manager access
 bot.commands = new Discord.Collection();
 bot.aliases = new Discord.Collection();
 bot.queue = new Map()
+bot.snipes = new Map()
 
 require('./handlers/command.js')(bot)
 
-
+bot.on('messageDelete', function(message, channel){
+  bot.snipes.set(message.channel.id, {
+    pfp:message.author.avatarURL(),
+    author:message.author.tag,
+    content:message.content,
+    image:message.attachments.first() ? message.attachments.first().proxyURL : null
+  })
+})
   
 
 
@@ -48,9 +56,8 @@ bot.on("message", async message => {
     let command = bot.commands.get(cmd);
     // If none is found, try to find it by alias
     if (!command) command = bot.commands.get(bot.aliases.get(cmd));
-    console.log(command);
     // If a command is finally found, run the command
-    if (command) if (!WIPCOMMANDS.includes(command.name) || owner.includes(message.author))
+    if (command) if (!WIPCOMMANDS.includes(command.name) || owner.includes(message.author.id))
         command.run(bot, message, args, prefix, owner);
   } catch(e) {
     console.log(e.stack);

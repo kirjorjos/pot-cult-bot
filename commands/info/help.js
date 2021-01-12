@@ -6,6 +6,7 @@ module.exports = {
     "Get list of all command and even get to know every command detials",
   usage: "help <cmd>",
   category: "info",
+  aliases: ['h'],
   run: async (bot, message, args) => {
     if (args[0]) {
       const command = await bot.commands.get(args[0]);
@@ -18,6 +19,7 @@ module.exports = {
         .setAuthor(command.name, bot.user.displayAvatarURL())
         .addField("Description", command.description || "Not Provided :(")
         .addField("Usage", "`" + command.usage + "`" || "Not Provied")
+        .addField("Aliases", "`" + command.aliases + "`" || "No aliases")
         .setThumbnail(bot.user.displayAvatarURL())
         .setColor("GREEN")
         .setFooter(bot.user.username, bot.user.displayAvatarURL());
