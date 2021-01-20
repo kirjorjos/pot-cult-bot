@@ -10,6 +10,7 @@ bot.commands = new Discord.Collection();
 bot.aliases = new Discord.Collection();
 bot.queue = new Map()
 bot.snipes = new Map()
+const inviteNotifactions = require('./Util/invite-notifaction')
 
 require('./handlers/command.js')(bot)
 
@@ -26,6 +27,9 @@ bot.on('messageDelete', function(message, channel){
 
 bot.on("ready", async () =>{
     console.log(`Logged in as ${bot.user.tag}!`);
+
+    inviteNotifactions(bot)
+
     bot.user.setPresence({
         status: "online",  //You can show online, idle....
         game: {
